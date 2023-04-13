@@ -22,6 +22,10 @@ export const createUser = (username, email) => {
   });
 };
 
+export const isUsernameAvailable = (username) => {
+  return callEndpoint(`/userAvailable/${username}`);
+};
+
 export const createPost = (userId, message) => {
   return callEndpoint(`/post`, {
     method: "POST",

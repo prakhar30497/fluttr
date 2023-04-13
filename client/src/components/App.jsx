@@ -6,16 +6,25 @@ import Signup from "./Signup";
 import Posts from "./Posts";
 import Post from "./Post";
 import { useAuth } from "../hooks/AuthContext";
+import { useUser } from "../hooks/UserContext";
 import { PostProvider } from "../hooks/PostContext";
 
 function App() {
   const { currentUser } = useAuth();
+  const { user } = useUser();
 
   return (
     <div className="App">
       <Routes>
-        <Route path="/login" exact element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/login"
+          exact
+          element={currentUser ? <Navigate replace to={"/"} /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={currentUser ? <Navigate replace to={"/"} /> : <Signup />}
+        />
         <Route
           path="/"
           element={currentUser ? <Posts /> : <Navigate replace to={"/login"} />}
@@ -23,12 +32,12 @@ function App() {
         <Route
           path="/post/:id"
           element={
-            currentUser ? (
+            currentUser && user ? (
               <PostProvider>
                 <Post />
               </PostProvider>
             ) : (
-              <Navigate replace to={"/login"} />
+              <Navigate replace to={"/"} />
             )
           }
         />

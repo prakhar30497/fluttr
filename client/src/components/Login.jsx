@@ -8,11 +8,17 @@ import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import MuiAlert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/AuthContext";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const LoginComp = (props) => {
   const navigate = useNavigate();
@@ -20,6 +26,8 @@ const LoginComp = (props) => {
   const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -32,13 +40,28 @@ const LoginComp = (props) => {
     try {
       setError("");
       setLoading(true);
-      await login(data.get("email"), data.get("password"));
-      navigate(`/`);
+      await login(data.get("email"), data.get("password")).then((data) => {
+        if (data.errorCode) {
+          setError(data.errorMessage);
+          setOpen(true);
+        } else {
+          navigate(`/`);
+        }
+      });
     } catch {
       setError("Failed to log in");
+      setOpen(true);
     }
 
     setLoading(false);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
   };
 
   return (
@@ -55,9 +78,12 @@ const LoginComp = (props) => {
         {/* <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
           <LockOutlinedIcon />
         </Avatar> */}
-        <Typography component="h1" variant="h5">
-          Login
+        <Typography component="h1" variant="h2" sx={{ marginBottom: "8rem" }}>
+          Fluttr
         </Typography>
+        {/* <Typography component="h1" variant="h5">
+          Login
+        </Typography> */}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -66,8 +92,6 @@ const LoginComp = (props) => {
             id="email"
             label="Email Address"
             name="email"
-            autoComplete="email"
-            autoFocus
           />
           <TextField
             margin="normal"
@@ -77,7 +101,6 @@ const LoginComp = (props) => {
             label="Password"
             type="password"
             id="password"
-            autoComplete="current-password"
           />
           <Button
             type="submit"
@@ -101,6 +124,11 @@ const LoginComp = (props) => {
             </Grid>
           </Grid>
         </Box>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+            {error}
+          </Alert>
+        </Snackbar>
       </Box>
     </Container>
   );

@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import GlobalStyles from "@mui/material/GlobalStyles";
-import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -150,6 +142,7 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
           </Box>
 
           <IconButton
+            aria-label="Reply"
             onClick={() => {
               setEditing(false);
               setReplying((prev) => !prev);
@@ -158,15 +151,18 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
             <ReplyIcon color="primary" />
           </IconButton>
           <IconButton
+            aria-label="Edit"
             onClick={() => {
               setReplying(false);
               setEditing((prev) => !prev);
             }}
             disabled={!isMyComment}
+            size="small"
           >
             <EditIcon color={!isMyComment ? "" : "primary"} />
           </IconButton>
           <IconButton
+            aria-label="Delete"
             disabled={!isMyComment || deleteCommentFn.loading}
             onClick={onCommentDelete}
           >

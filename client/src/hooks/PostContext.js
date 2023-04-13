@@ -4,6 +4,7 @@ import { useAsync } from "../hooks/useAsync";
 import { getPost } from "../services/api";
 import { useUser } from "./UserContext";
 import { useAuth } from "./AuthContext";
+import Loader from "../components/common/Loader";
 
 const Context = React.createContext();
 
@@ -13,12 +14,7 @@ export function usePost() {
 
 export function PostProvider({ children }) {
   const { id } = useParams();
-  const { currentUser } = useAuth();
-  const { user, getCurrentUser } = useUser();
-
-  useEffect(() => {
-    getCurrentUser(currentUser.email);
-  }, [currentUser]);
+  const { user } = useUser();
 
   const {
     loading,
@@ -106,7 +102,7 @@ export function PostProvider({ children }) {
       }}
     >
       {loading ? (
-        <h1>Loading</h1>
+        <Loader />
       ) : error ? (
         <h1 className="error-msg">{error}</h1>
       ) : (

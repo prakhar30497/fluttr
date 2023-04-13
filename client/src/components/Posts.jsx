@@ -14,11 +14,9 @@ import { createPost, getUser, getPosts } from "../services/api";
 import CreatePost from "./CreatePost";
 import { useAuth } from "../hooks/AuthContext";
 import { useUser } from "../hooks/UserContext";
+import Loader from "./common/Loader";
 
 const Posts = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [posts, setPosts] = useState([]);
   const [posted, setPosted] = useState(0);
 
   const { currentUser } = useAuth();
@@ -26,22 +24,15 @@ const Posts = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // useEffect(() => {
-  //   useAsync(getPosts).then((data) => console.log(data));
-  // }, []);
-
-  useEffect(() => {
-    // getUser(currentUser.email).then((data) => setUser(data));
-    getPosts().then((data) => setPosts(data));
-  }, []);
-
   useEffect(() => {
     getCurrentUser(currentUser.email);
   }, [currentUser]);
 
-  useEffect(() => {
-    getPosts().then((data) => setPosts(data));
-  }, [posted]);
+  // useEffect(() => {
+  //   getPosts().then((data) => setPosts(data));
+  // }, [posted]);
+
+  const { loading, error, value: posts } = useAsync(getPosts, [posted]);
 
   const handleFabClick = () => {
     setDialogOpen(true);
@@ -52,12 +43,14 @@ const Posts = () => {
   };
 
   const handleDialogSubmit = (body) => {
-    createPost(user.id, body);
-    setPosted(posted + 1);
+    createPost(user.id, body).then((data) => {
+      console.log(data);
+      setPosted(posted + 1);
+    });
     setDialogOpen(false);
   };
 
-  if (loading) return <h1>Loading</h1>;
+  if (loading) return <Loader />;
   if (error) return <h1>{error}</h1>;
 
   return (
@@ -88,7 +81,17 @@ const Posts = () => {
                         <Typography variant="h6">{post.user.name}</Typography>
                       </Box>
                       <Box padding={1}>
-                        <Typography variant="body2">{post.body}</Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            display: "-webkit-box",
+                            overflow: "hidden",
+                            WebkitBoxOrient: "vertical",
+                            WebkitLineClamp: 4,
+                          }}
+                        >
+                          {post.body}
+                        </Typography>
                       </Box>
                     </Paper>
                   </Link>

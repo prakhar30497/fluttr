@@ -58,6 +58,9 @@ export default function Signup() {
           {/* <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar> */}
+          <Typography component="h1" variant="h2" sx={{ marginBottom: "8rem" }}>
+            Fluttr
+          </Typography>
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
@@ -112,7 +115,7 @@ export default function Signup() {
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <NavLink to="/">
-                  <Link variant="body2">Already have an account? Sign in</Link>
+                  <Link variant="body2">Already have an account? Login</Link>
                 </NavLink>
               </Grid>
             </Grid>
