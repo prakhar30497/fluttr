@@ -46,6 +46,22 @@ app.get("/user/:email", async (req, res) => {
   res.send(user);
 });
 
+app.get("/userAvailable/:username", async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { name: req.params.username },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+  console.log(user);
+  if (user) {
+    res.send({ isAvailable: false });
+  } else {
+    res.send({ isAvailable: true });
+  }
+});
+
 app.post("/user", async (req, res) => {
   const user = await prisma.user.create({
     data: { name: req.body.username, email: req.body.email },
