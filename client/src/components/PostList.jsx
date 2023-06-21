@@ -81,7 +81,10 @@ const PostList = ({ posts }) => {
                       <MoreVertIcon />
                     </IconButton>
                   </Box>
-                  <Box padding={1} paddingTop={2} paddingLeft={7}>
+                  <Box padding={1} paddingTop={1} paddingLeft={7}>
+                    <Typography variant="h6" fontWeight="regular">
+                      {post?.title}
+                    </Typography>
                     <Typography
                       variant="body2"
                       sx={{

@@ -236,7 +236,7 @@ app.post("/post", async (req, res) => {
       data: {
         userId: req.body.userId,
         body: req.body.message,
-        title: "Title",
+        title: req.body.title || "",
       },
       include: {
         user: true,
