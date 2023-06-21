@@ -11,10 +11,14 @@ import { useAuth } from "../hooks/AuthContext";
 const CreatePost = (props) => {
   const { open, handleDialogClose, handleDialogSubmit } = props;
   const [message, setMessage] = useState("");
+  const [title, setTitle] = useState("");
   const { currentUser } = useAuth();
 
-  const handleChange = (e) => {
+  const handleMessageChange = (e) => {
     setMessage(e.target.value);
+  };
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
   };
   return (
     <div>
@@ -30,20 +34,33 @@ const CreatePost = (props) => {
             autoFocus
             margin="dense"
             multiline
+            rows={1}
+            id="title"
+            fullWidth
+            variant="outlined"
+            value={title}
+            label={"Title"}
+            placeholder={"Title (Optional)"}
+            onChange={handleTitleChange}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            multiline
             rows={4}
-            id="name"
+            id="message"
             fullWidth
             variant="outlined"
             value={message}
             placeholder={currentUser ? "What's happening?" : "Login to Post"}
-            onChange={handleChange}
+            onChange={handleMessageChange}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
           <Button
             variant="contained"
-            onClick={(e) => handleDialogSubmit(message)}
+            onClick={(e) => handleDialogSubmit(title, message)}
             disabled={!currentUser || !message}
           >
             Post

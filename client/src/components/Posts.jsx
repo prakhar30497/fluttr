@@ -61,8 +61,8 @@ const Posts = () => {
     setDrawerOpen(false);
   };
 
-  const handleDialogSubmit = (body) => {
-    createPost(axiosPrivate, currentUser.id, body).then((data) => {
+  const handleDialogSubmit = (title, body) => {
+    createPost(axiosPrivate, currentUser.id, title, body).then((data) => {
       console.log(data);
       setPosted(posted + 1);
       // socket.emit("create-post", user.id, body);

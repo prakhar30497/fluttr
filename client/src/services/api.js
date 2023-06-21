@@ -57,11 +57,12 @@ export const isUsernameAvailable = (username) => {
   return callEndpoint(`/userAvailable/${username}`);
 };
 
-export const createPost = (axiosPrivate, userId, message) => {
+export const createPost = (axiosPrivate, userId, title, message) => {
   return callPrivateEndpoint(axiosPrivate, `/post`, {
     method: "POST",
     data: {
       userId,
+      title,
       message,
     },
   });
