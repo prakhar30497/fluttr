@@ -12,6 +12,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import EditIcon from "@mui/icons-material/Edit";
 import { usePost } from "../hooks/PostContext";
 import { useUser } from "../hooks/UserContext";
+import { useAuth } from "../hooks/AuthContext";
 import CommentForm from "./CommentForm";
 import { useAsyncFn } from "../hooks/useAsync";
 import {
@@ -22,7 +23,8 @@ import {
 } from "../services/api";
 
 const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
-  const { user: currentUser } = useUser({});
+  const { currentUser } = useAuth();
+
   const isMyComment = currentUser?.id === user?.id;
 
   const [replying, setReplying] = useState(false);
@@ -102,7 +104,6 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
           sx={{
             display: "flex",
             flexDirection: "row",
-            bgcolor: "background.paper",
             justifyContent: "space-between",
             alignItems: "stretch",
           }}
@@ -131,8 +132,13 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
               alignItems: "center",
             }}
           >
-            <IconButton aria-label="Like" size="small" onClick={onToggleLike}>
-              {!!likedByMe ? (
+            <IconButton
+              aria-label="Like"
+              size="small"
+              onClick={onToggleLike}
+              disabled={!currentUser}
+            >
+              {!!likedByMe && currentUser ? (
                 <FavoriteIcon color="primary" />
               ) : (
                 <FavoriteBorderIcon color="primary" />
@@ -148,7 +154,7 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
               setReplying((prev) => !prev);
             }}
           >
-            <ReplyIcon color="primary" />
+            <ChatBubbleOutlineIcon color="primary" />
           </IconButton>
           <IconButton
             aria-label="Edit"
@@ -156,17 +162,17 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
               setReplying(false);
               setEditing((prev) => !prev);
             }}
-            disabled={!isMyComment}
+            disabled={!isMyComment || !currentUser}
             size="small"
           >
-            <EditIcon color={!isMyComment ? "" : "primary"} />
+            <EditIcon color={!isMyComment || !currentUser ? "" : "primary"} />
           </IconButton>
           <IconButton
             aria-label="Delete"
-            disabled={!isMyComment || deleteCommentFn.loading}
+            disabled={!isMyComment || deleteCommentFn.loading || !currentUser}
             onClick={onCommentDelete}
           >
-            <DeleteIcon color={!isMyComment ? "" : "error"} />
+            <DeleteIcon color={!isMyComment || !currentUser ? "" : "error"} />
           </IconButton>
         </Box>
       </Paper>

@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAsync } from "../hooks/useAsync";
 import { getPost } from "../services/api";
-import { useUser } from "./UserContext";
 import { useAuth } from "./AuthContext";
 import Loader from "../components/common/Loader";
 
@@ -14,13 +13,13 @@ export function usePost() {
 
 export function PostProvider({ children }) {
   const { id } = useParams();
-  const { user } = useUser();
+  const { currentUser } = useAuth();
 
   const {
     loading,
     error,
     value: post,
-  } = useAsync(() => getPost(id, user?.id), [id]);
+  } = useAsync(() => getPost(id, currentUser?.id), [id]);
 
   const [comments, setComments] = useState([]);
   const commentsByParentId = useMemo(() => {

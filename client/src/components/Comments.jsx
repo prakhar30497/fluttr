@@ -7,12 +7,12 @@ import Comment from "./Comment";
 import CommentForm from "./CommentForm";
 import { useAsyncFn } from "../hooks/useAsync";
 import { createComment } from "../services/api";
-import { useUser } from "../hooks/UserContext";
+import { useAuth } from "../hooks/AuthContext";
 import { usePost } from "../hooks/PostContext";
 
 const Comments = ({ comments }) => {
   const { post, createLocalComment } = usePost();
-  const { user } = useUser();
+  const { currentUser } = useAuth();
 
   const {
     loading,
@@ -21,9 +21,11 @@ const Comments = ({ comments }) => {
   } = useAsyncFn(createComment);
 
   function onCreateComment(message) {
-    return createCommentFn({ userId: user.id, postId: post.id, message }).then(
-      createLocalComment
-    );
+    return createCommentFn({
+      userId: currentUser.id,
+      postId: post.id,
+      message,
+    }).then(createLocalComment);
   }
 
   return (
@@ -40,7 +42,7 @@ const Comments = ({ comments }) => {
       <Grid item>
         {comments &&
           comments.map((comment) => {
-            return <Comment {...comment} />;
+            return <Comment {...comment} key={comment.id} />;
           })}
         <Paper elevation={3}></Paper>
       </Grid>

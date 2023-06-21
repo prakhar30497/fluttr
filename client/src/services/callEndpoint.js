@@ -1,9 +1,4 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL,
-  withCredentials: true,
-});
+import { api } from "./axios";
 
 export async function callEndpoint(url, options) {
   try {
@@ -11,5 +6,14 @@ export async function callEndpoint(url, options) {
     return res.data;
   } catch (error) {
     return await Promise.reject(error?.response?.data?.message ?? "Error");
+  }
+}
+
+export async function callPrivateEndpoint(axiosPrivate, url, options) {
+  try {
+    const res = await axiosPrivate(url, options);
+    return res.data;
+  } catch (error) {
+    return await Promise.reject(error?.response?.data?.message ?? "Auth Error");
   }
 }

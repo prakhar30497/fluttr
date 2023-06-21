@@ -1,4 +1,27 @@
-import { callEndpoint } from "./callEndpoint.js";
+import { callEndpoint, callPrivateEndpoint } from "./callEndpoint.js";
+
+const accessToken = localStorage.getItem("accessToken");
+
+export const register = (name, email, password) => {
+  return callEndpoint(`/register`, {
+    method: "POST",
+    data: {
+      name,
+      email,
+      password,
+    },
+  });
+};
+
+export const loginUser = (email, password) => {
+  return callEndpoint(`/login`, {
+    method: "POST",
+    data: {
+      email,
+      password,
+    },
+  });
+};
 
 export const getPosts = () => {
   return callEndpoint("/posts");
@@ -8,8 +31,16 @@ export const getPost = (id, userId) => {
   return callEndpoint(`/post/${id}/${userId}`);
 };
 
-export const getUser = (email) => {
-  return callEndpoint(`/user/${email}`);
+export const getUser = (email, accessToken) => {
+  return callEndpoint(`/user/${email}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const getUserProfile = (handle) => {
+  return callEndpoint(`/profile/${handle}`);
 };
 
 export const createUser = (username, email) => {
@@ -26,8 +57,8 @@ export const isUsernameAvailable = (username) => {
   return callEndpoint(`/userAvailable/${username}`);
 };
 
-export const createPost = (userId, message) => {
-  return callEndpoint(`/post`, {
+export const createPost = (axiosPrivate, userId, message) => {
+  return callPrivateEndpoint(axiosPrivate, `/post`, {
     method: "POST",
     data: {
       userId,
@@ -60,5 +91,25 @@ export const toggleLike = ({ userId, postId, id }) => {
   return callEndpoint(`posts/${postId}/comments/${id}/toggleLike`, {
     method: "POST",
     data: { userId },
+  });
+};
+
+export const checkFollower = (followerId, followingId) => {
+  return callEndpoint(
+    `/followers/check?followerId=${followerId}&followingId=${followingId}`
+  );
+};
+
+export const addFollower = (followerId, followingId) => {
+  return callEndpoint(`/followers/add`, {
+    method: "POST",
+    data: { followerId, followingId },
+  });
+};
+
+export const removeFollower = (followerId, followingId) => {
+  return callEndpoint(`/followers/remove`, {
+    method: "POST",
+    data: { followerId, followingId },
   });
 };

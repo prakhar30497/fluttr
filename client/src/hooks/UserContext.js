@@ -10,8 +10,8 @@ export const useUser = () => {
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState();
 
-  const getCurrentUser = (email) => {
-    getUser(email).then((data) => setUser(data));
+  const getCurrentUser = () => {
+    getUser(localStorage.getItem(email)).then((data) => setUser(data));
   };
 
   const value = {

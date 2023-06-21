@@ -11,6 +11,7 @@ import GlobalStyles from "@mui/material/GlobalStyles";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Appbar from "./common/AppBar";
+import DrawerList from "./common/DrawerList";
 import { usePost } from "../hooks/PostContext";
 import { useUser } from "../hooks/UserContext";
 import IconButton from "@mui/material/IconButton";
@@ -20,14 +21,24 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import Comments from "./Comments";
 
 const Post = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { post, rootComments } = usePost();
   const navigate = useNavigate();
   // const likedByMe = true;
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
   return (
-    <div>
-      <CssBaseline />
-      <Appbar />
-      <Container maxWidth="md" component="main" style={{ paddingTop: "50px" }}>
+    <>
+      {/* <CssBaseline /> */}
+      {/* <Appbar handleDrawerOpen={handleDrawerOpen} />
+      <DrawerList open={drawerOpen} handleDrawerClose={handleDrawerClose} /> */}
+      <Container maxWidth="md" component="main" style={{ marginTop: "100px" }}>
         {/* <IconButton
           aria-label="Back"
           style={{ zIndex: 100, left: -40, top: -40 }}
@@ -40,6 +51,22 @@ const Post = () => {
         <Grid container direction={"column"} rowSpacing={2}>
           {post && (
             <Box>
+              <Box
+                padding={1}
+                paddingLeft={0}
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                <IconButton
+                  aria-label="Back"
+                  sx={{ marginRight: "1rem" }}
+                  onClick={() => {
+                    navigate(`/`);
+                  }}
+                >
+                  <ArrowBackIosNewIcon color="primary" />
+                </IconButton>
+                <Typography variant="h5">Post</Typography>
+              </Box>
               <Box padding={1} paddingBottom={0}>
                 <Typography variant="h6">{post?.user?.name}</Typography>
               </Box>
@@ -91,7 +118,7 @@ const Post = () => {
           }
         </Grid>
       </Container>
-    </div>
+    </>
   );
 };
 

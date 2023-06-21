@@ -6,10 +6,12 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useAuth } from "../hooks/AuthContext";
 
 const CreatePost = (props) => {
   const { open, handleDialogClose, handleDialogSubmit } = props;
   const [message, setMessage] = useState("");
+  const { currentUser } = useAuth();
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -33,7 +35,7 @@ const CreatePost = (props) => {
             fullWidth
             variant="outlined"
             value={message}
-            placeholder="What's happening?"
+            placeholder={currentUser ? "What's happening?" : "Login to Post"}
             onChange={handleChange}
           />
         </DialogContent>
@@ -42,6 +44,7 @@ const CreatePost = (props) => {
           <Button
             variant="contained"
             onClick={(e) => handleDialogSubmit(message)}
+            disabled={!currentUser || !message}
           >
             Post
           </Button>

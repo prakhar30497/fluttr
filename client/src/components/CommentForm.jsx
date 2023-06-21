@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import { useAuth } from "../hooks/AuthContext";
 
 const CommentForm = ({ rows, loading, error, onSubmit, initialValue = "" }) => {
   const [message, setMessage] = useState(initialValue);
+  const { currentUser } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ const CommentForm = ({ rows, loading, error, onSubmit, initialValue = "" }) => {
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={loading || !message}
+          disabled={loading || !message || !currentUser}
         >
           {loading ? "Loading" : "Post"}
         </Button>

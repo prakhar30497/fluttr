@@ -11,21 +11,41 @@ datasource db {
 }
 
 model Post {
-  id       String    @id @default(uuid())
-  title    String
-  body     String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String     @id @default(uuid())
+  title     String
+  body      String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  comments Comment[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  comments  Comment[]
+  likes     PostLike[]
+  group     Group?     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String?
 }
 
 model User {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  email    String
-  posts    Post[]
-  comments Comment[]
-  likes    Like[]
+  id            String     @id @default(uuid())
+  isAdmin       Boolean    @default(false)
+  name          String
+  handle        String     @unique
+  email         String     @unique
+  password      String
+  about         String?
+  avatar        String?
+  location      String?
+  posts         Post[]
+  createdAt     DateTime   @default(now())
+  comments      Comment[]
+  likes         Like[]
+  postLikes     PostLike[]
+  refreshTokens RefreshToken[]
+  groups        Group[]    @relation("member")
+  createdGroups Group[]    @relation("owner")
+  followedBy    Follows[]  @relation("following")
+  following     Follows[]  @relation("follower")
+  // friends         User[] @relation("friends")
+  // friendsRelation User[] @relation("friends")
 }
 
 model Comment {
@@ -48,5 +68,52 @@ model Like {
   comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
   userId    String
   commentId String
+
   @@id([userId, commentId])
+}
+
+model PostLike {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  postId String
+
+  @@id([userId, postId])
+}
+
+model Group {
+  id         String   @id @default(uuid())
+  name       String
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  createdAt  DateTime @default(now())
+  owner      User     @relation("owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId    String
+  members    User[]   @relation("member")
+  posts      Post[]
+}
+
+model Category {
+  id     String  @id @default(uuid())
+  name   String
+  groups Group[]
+}
+
+model Follows {
+  follower    User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   User   @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  @@id([followerId, followingId])
+}
+
+model RefreshToken {
+  id          String   @id @unique @default(uuid())
+  hashedToken String
+  userId      String
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

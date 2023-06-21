@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
@@ -41,12 +40,13 @@ const LoginComp = (props) => {
       setError("");
       setLoading(true);
       await login(data.get("email"), data.get("password")).then((data) => {
-        if (data.errorCode) {
-          setError(data.errorMessage);
-          setOpen(true);
-        } else {
-          navigate(`/`);
-        }
+        navigate(`/`);
+        // if (data.errorCode) {
+        //   setError(data.errorMessage);
+        //   setOpen(true);
+        // } else {
+        //   navigate(`/`);
+        // }
       });
     } catch {
       setError("Failed to log in");
@@ -66,7 +66,6 @@ const LoginComp = (props) => {
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <Box
         sx={{
           marginTop: 8,

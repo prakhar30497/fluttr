@@ -1,5 +1,6 @@
 body {
   height: 100vh;
+  background-color: #f7f9fb;
 }
 
 :root {
@@ -9,8 +10,8 @@ body {
   height: auto;
   /* color: rgba(255, 255, 255, 0.87); */
   /* background-color: #242424; */
-  color: #242424;
-  background-color: #fff;
+  /* color: #242424;
+  background-color: #fff; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

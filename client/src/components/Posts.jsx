@@ -1,38 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router-dom";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
 import Appbar from "./common/AppBar";
-import { useAsync } from "../hooks/useAsync";
+import DrawerList from "./common/DrawerList";
+import { useAsync, useAsyncFn } from "../hooks/useAsync";
 import { createPost, getUser, getPosts } from "../services/api";
 import CreatePost from "./CreatePost";
+import PostList from "./PostList";
 import { useAuth } from "../hooks/AuthContext";
-import { useUser } from "../hooks/UserContext";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import Loader from "./common/Loader";
+
+import { io } from "socket.io-client";
+import { Box, Typography } from "@mui/material";
+
+// const socket = io("http://localhost:5000");
+// socket.on("connect", () => {
+//   console.log("connected");
+// });
 
 const Posts = () => {
   const [posted, setPosted] = useState(0);
 
-  const { currentUser } = useAuth();
-  const { user, getCurrentUser } = useUser();
+  const { currentUser, getCurrentUser } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  // const { user, getCurrentUser } = useUser();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  useEffect(() => {
-    getCurrentUser(currentUser.email);
-  }, [currentUser]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // useEffect(() => {
   //   getPosts().then((data) => setPosts(data));
   // }, [posted]);
 
   const { loading, error, value: posts } = useAsync(getPosts, [posted]);
+
+  // socket.on("receive-post", (newPost) => {
+  //   console.log("new", newPost);
+  //   // posts?.push(newPost);
+  //   setPosted(posted + 1);
+  // });
 
   const handleFabClick = () => {
     setDialogOpen(true);
@@ -42,63 +53,56 @@ const Posts = () => {
     setDialogOpen(false);
   };
 
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
+
   const handleDialogSubmit = (body) => {
-    createPost(user.id, body).then((data) => {
+    createPost(axiosPrivate, currentUser.id, body).then((data) => {
       console.log(data);
       setPosted(posted + 1);
+      // socket.emit("create-post", user.id, body);
     });
     setDialogOpen(false);
   };
 
   if (loading) return <Loader />;
-  if (error) return <h1>{error}</h1>;
+  if (error) {
+    navigate("/login");
+    return;
+  }
 
   return (
     <div style={{ height: "100%" }}>
-      <CssBaseline />
-      <Appbar />
+      {/* <CssBaseline />
+      <Appbar handleDrawerOpen={handleDrawerOpen} />
+      <DrawerList open={drawerOpen} handleDrawerClose={handleDrawerClose} /> */}
       <Container
         maxWidth="md"
         component="main"
-        style={{ paddingTop: "50px", height: "100%" }}
+        style={{ marginTop: "100px", height: "100%" }}
       >
-        <Grid
-          container
-          direction={"column"}
-          rowSpacing={2}
-          style={{ paddingBottom: "100px" }}
-        >
-          {posts &&
-            posts.map((post) => {
-              return (
-                <Grid item xs={6} key={post.id}>
-                  <Link
-                    to={`/post/${post.id}`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Paper elevation={3}>
-                      <Box padding={1} paddingBottom={0}>
-                        <Typography variant="h6">{post.user.name}</Typography>
-                      </Box>
-                      <Box padding={1}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            display: "-webkit-box",
-                            overflow: "hidden",
-                            WebkitBoxOrient: "vertical",
-                            WebkitLineClamp: 4,
-                          }}
-                        >
-                          {post.body}
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Link>
-                </Grid>
-              );
-            })}
-        </Grid>
+        {currentUser && (
+          <Box style={{ display: "flex", gap: "0.6rem", padding: "1rem" }}>
+            <Typography style={{ fontSize: "2rem", fontFamily: "Nirmala UI" }}>
+              Hello,{" "}
+            </Typography>
+            <Typography
+              style={{
+                fontSize: "2rem",
+                fontFamily: "Nirmala UI",
+                fontWeight: "bold",
+              }}
+            >
+              {currentUser?.name}
+            </Typography>
+          </Box>
+        )}
+        <PostList posts={posts} />
         <CreatePost
           open={dialogOpen}
           handleDialogClose={handleDialogClose}
