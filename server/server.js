@@ -252,7 +252,7 @@ app.post("/post", async (req, res) => {
     });
 
   console.log(JSON.stringify(post));
-  io.emit("receive-post", post);
+  // io.emit("receive-post", post);
   res.send(post);
 });
 
@@ -531,6 +531,156 @@ app.post("/followers/remove", async (req, res) => {
   }
 });
 
+app.post("/search", async (req, res) => {
+  const { q } = req.query;
+  const { userId } = req.body;
+
+  console.log(typeof userId);
+
+  const users = await prisma.user.findMany({
+    where: {
+      handle: {
+        startsWith: q,
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      handle: true,
+    },
+  });
+
+  const results = users.filter((user) => user.id !== String(userId));
+  res.json({ users: results });
+});
+
+app.post("/startChat", auth, async (req, res) => {
+  const { participants } = req.body;
+  console.log(participants);
+  try {
+    if (participants.length !== 2) {
+      return res.status(404);
+    }
+    const newChat = await prisma.chat.create({ data: {} });
+    console.log("newChat", newChat);
+
+    const newParticipant1 = await prisma.chatParticipant.create({
+      data: {
+        userId: participants[0],
+        chatId: newChat.id,
+      },
+    });
+
+    const newParticipant2 = await prisma.chatParticipant.create({
+      data: {
+        userId: participants[1],
+        chatId: newChat.id,
+      },
+    });
+
+    res.json({
+      chatId: newChat.id,
+      participants: [newParticipant1, newParticipant2],
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred." });
+  }
+});
+
+app.get("/chats", auth, async (req, res) => {
+  const { userId } = req;
+  console.log("userId", userId);
+
+  try {
+    const chatParticipants = await prisma.chatParticipant.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        chat: {
+          include: {
+            participants: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    handle: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Extract user information of each participant in the user's chats
+    const participantsInfo = chatParticipants.map((participant) => ({
+      chatId: participant.chatId,
+      ...participant.chat.participants.filter((p) => userId !== p.user.id)[0]
+        .user,
+    }));
+
+    // Return the participants' user information
+    res.json(participantsInfo);
+  } catch (error) {
+    console.error("Error retrieving user chats:", error);
+    res.status(500).json({ error: "Failed to retrieve user chats" });
+  }
+});
+
+app.get("/chats/:chatId/messages", auth, async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    // Retrieve messages of the specified chat
+    const messages = await prisma.message.findMany({
+      where: {
+        chatId,
+      },
+      select: {
+        content: true,
+        senderId: true,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    res.json(messages);
+  } catch (error) {
+    console.error("Error retrieving chat messages:", error);
+    res.status(500).json({ error: "Failed to retrieve chat messages" });
+  }
+});
+
+app.post("/chat", async (req, res) => {
+  try {
+    const { participants, message } = req.body;
+
+    // Create a new chat
+    const chat = await prisma.chat.create({
+      data: {
+        participants: {
+          connect: participants.map((participantId) => ({ id: participantId })),
+        },
+      },
+    });
+
+    // Emit chat data to the participants
+    participants.forEach((participantId) => {
+      io.to(participantId).emit("newChat", chat);
+    });
+
+    res.json(chat);
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    res.status(500).json({ error: "Failed to create chat" });
+  }
+});
+
 server.listen(port, function (err) {
   if (err) {
     console.log("Error while starting server");
@@ -539,26 +689,57 @@ server.listen(port, function (err) {
   }
 });
 
+const users = {};
+
 io.on("connection", (socket) => {
   console.log("a user connected");
-  socket.on("custom", (num, str, obj) => {
-    console.log(num, str, obj);
+  // socket.on("create-post", (userId, message) => {
+  //   console.log(userId, message);
+  // });
+
+  socket.on("addUser", (userId) => {
+    users[userId] = socket.id;
+    console.log(`User ${userId} registered with socket ID ${socket.id}`);
   });
-  socket.on("create-post", (userId, message) => {
-    console.log(userId, message);
-  });
+
+  socket.on(
+    "chatMessage",
+    async ({ chatId, senderId, recipientId, content }) => {
+      const senderSocket = users[senderId];
+      const recipientSocket = users[recipientId];
+
+      console.log(senderSocket, recipientSocket, users);
+
+      if (senderSocket && recipientSocket) {
+        console.log(senderSocket, recipientSocket);
+        // Emit the message to both sender and recipient
+        // io.to(senderSocket).emit("getMessage", { senderId, content });
+        io.to(recipientSocket).emit("getMessage", { senderId, content });
+      } else {
+        console.log(`One or both users are not online. Message not delivered.`);
+      }
+
+      const newMessage = await prisma.message.create({
+        data: {
+          chatId,
+          senderId,
+          recipientId,
+          content,
+        },
+      });
+    }
+  );
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    // Remove the user from the connected users list
+    const disconnectedUserId = Object.keys(users).find(
+      (userId) => users[userId] === socket.id
+    );
+    if (disconnectedUserId) {
+      delete users[disconnectedUserId];
+      console.log(`User ${disconnectedUserId} disconnected.`);
+    }
   });
 });
-
-// io.on("connection", (socket) => {
-//   console.log("a user connected");
-//   console.log(socket.id);
-//   // socket.on("custom", (num, str, obj) => {
-//   //   console.log(num, str, obj);
-//   // });
-// });
 
 // async function main() {
 //   const users = await prisma.user.findMany();

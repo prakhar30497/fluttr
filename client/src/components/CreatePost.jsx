@@ -6,20 +6,33 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useAuth } from "../hooks/AuthContext";
 
 const CreatePost = (props) => {
   const { open, handleDialogClose, handleDialogSubmit } = props;
-  const [message, setMessage] = useState("");
+
   const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [titleError, setTitleError] = useState(false);
+  const [bodyError, setBodyError] = useState(false);
+
+  const errors = {
+    title: "Input upto 50 characters",
+    body: "Input upto 300 characters",
+  };
+
   const { currentUser } = useAuth();
 
-  const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-  };
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
+    e.target.value.length > 50 ? setTitleError(true) : setTitleError(false);
   };
+  const handleBodyChange = (e) => {
+    setBody(e.target.value);
+    e.target.value.length > 300 ? setBodyError(true) : setBodyError(false);
+  };
+
   return (
     <div>
       <Dialog
@@ -42,26 +55,48 @@ const CreatePost = (props) => {
             label={"Title"}
             placeholder={"Title (Optional)"}
             onChange={handleTitleChange}
+            error={titleError}
+            helperText={titleError && errors.title}
+            InputProps={
+              titleError && {
+                endAdornment: (
+                  <InputAdornment position="start">
+                    {title.length}/50
+                  </InputAdornment>
+                ),
+              }
+            }
           />
           <TextField
             autoFocus
             margin="dense"
             multiline
             rows={4}
-            id="message"
+            id="body"
             fullWidth
             variant="outlined"
-            value={message}
+            value={body}
             placeholder={currentUser ? "What's happening?" : "Login to Post"}
-            onChange={handleMessageChange}
+            onChange={handleBodyChange}
+            error={bodyError}
+            helperText={bodyError && errors.body}
+            InputProps={
+              bodyError && {
+                endAdornment: (
+                  <InputAdornment position="start">
+                    {body.length}/300
+                  </InputAdornment>
+                ),
+              }
+            }
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
           <Button
             variant="contained"
-            onClick={(e) => handleDialogSubmit(title, message)}
-            disabled={!currentUser || !message}
+            onClick={(e) => handleDialogSubmit(title, body)}
+            disabled={!currentUser || !body || titleError || bodyError}
           >
             Post
           </Button>

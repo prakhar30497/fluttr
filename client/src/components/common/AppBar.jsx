@@ -4,6 +4,7 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import { useAuth } from "../../hooks/AuthContext";
 import { useUser } from "../../hooks/UserContext";
 import IconButton from "@mui/material/IconButton";
@@ -58,6 +59,7 @@ const Appbar = ({ handleDrawerOpen, back }) => {
           >
             Fluttr
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
           <div style={{ display: "flex" }}>
             {/* <Link
               variant="button"

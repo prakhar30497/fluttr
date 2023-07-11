@@ -114,3 +114,32 @@ export const removeFollower = (followerId, followingId) => {
     data: { followerId, followingId },
   });
 };
+
+export const getMessages = (userId) => {
+  return callEndpoint(`/messages`, {
+    method: "GET",
+    data: { userId },
+  });
+};
+
+export const searchUsers = (query, userId) => {
+  return callEndpoint(`/search?q=${query}`, {
+    method: "POST",
+    data: { userId },
+  });
+};
+
+export const startChat = (axiosPrivate, participants) => {
+  return callPrivateEndpoint(axiosPrivate, "/startChat", {
+    method: "POST",
+    data: { participants },
+  });
+};
+
+export const getAllChats = (axiosPrivate) => {
+  return callPrivateEndpoint(axiosPrivate, "/chats");
+};
+
+export const getChatMessages = (axiosPrivate, chatId) => {
+  return callPrivateEndpoint(axiosPrivate, `/chats/${chatId}/messages`);
+};
