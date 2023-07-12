@@ -71,3 +71,13 @@ export const stringAvatar = (name, profile) => {
         children: `${name.split(" ")[0][0].toUpperCase()}`,
       };
 };
+
+export const debounce = (cb, delay = 300) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      cb(...args);
+    }, delay);
+  };
+};

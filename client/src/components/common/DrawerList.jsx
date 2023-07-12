@@ -91,25 +91,26 @@ const DrawerList = ({ open, handleDrawerClose }) => {
                 <ListItemText primary="Profile" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding onClick={() => handleItemClick(`/groups`)}>
+            <ListItem
+              disablePadding
+              onClick={() => handleItemClick(`/messages`)}
+            >
               <ListItemButton>
                 <ListItemIcon>
                   <ForumIcon />
                 </ListItemIcon>
-                <ListItemText primary="Groups" />
+                <ListItemText primary="Messages" />
               </ListItemButton>
             </ListItem>
-            <ListItem
-              disablePadding
-              onClick={() => handleItemClick(`/friends`)}
-            >
+            <ListItem disablePadding onClick={() => handleItemClick(`/groups`)}>
               <ListItemButton>
                 <ListItemIcon>
                   <PeopleIcon />
                 </ListItemIcon>
-                <ListItemText primary="Friends" />
+                <ListItemText primary="Groups" />
               </ListItemButton>
             </ListItem>
+
             <ListItem
               disablePadding
               onClick={() => handleItemClick(`/settings`)}

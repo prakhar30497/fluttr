@@ -14,7 +14,7 @@ import { useTheme } from "../hooks/ThemeContext";
 import Appbar from "./common/AppBar";
 import DrawerList from "./common/DrawerList";
 import Groups from "./Groups";
-import Friends from "./Friends";
+import Messages from "./Messages";
 import Profile from "./Profile";
 import Settings from "./Settings";
 
@@ -74,7 +74,7 @@ function App() {
             }
           />
           <Route path="/groups" element={<Groups />} />
-          <Route path="/friends" element={<Friends />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="/profile/:userHandle" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>

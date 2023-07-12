@@ -12,6 +12,9 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
 import ForumIcon from "@mui/icons-material/Forum";
+import Card from "@mui/material/Card";
+import CardActionArea from "@mui/material/CardActionArea";
+import CardContent from "@mui/material/CardContent";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { stringAvatar, convertTime } from "../../utils/index";
 
@@ -24,80 +27,81 @@ const PostList = ({ posts }) => {
           return (
             <Grid item xs={6} key={post.id} margin={1}>
               <Link to={`/post/${post.id}`} style={{ textDecoration: "none" }}>
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    boxShadow: 1,
-                    borderRadius: 2,
-                    p: 1,
-                  }}
-                >
-                  <Box
-                    padding={1}
-                    paddingBottom={0}
+                <Card>
+                  <CardActionArea
+                    variant="outlined"
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
+                      boxShadow: 1,
+                      borderRadius: 2,
+                      p: 1,
                     }}
                   >
-                    <Avatar
-                      {...stringAvatar(post.user.name)}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/profile/${post.user.handle}`);
+                    <Box
+                      padding={1}
+                      paddingBottom={0}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
                       }}
-                    />
-                    <Box sx={{ marginRight: "auto" }}>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          textDecoration: "none",
-                          "&:hover": { textDecoration: "underline" },
-                        }}
+                    >
+                      <Avatar
+                        {...stringAvatar(post.user.name)}
                         onClick={(e) => {
                           e.preventDefault();
                           navigate(`/profile/${post.user.handle}`);
                         }}
-                      >
-                        {post.user.name}
-                      </Typography>
-                      <Box sx={{ display: "flex" }}>
-                        <Typography variant="caption" color="#71767b">
-                          @{post.user.handle}&nbsp;
+                      />
+                      <Box sx={{ marginRight: "auto" }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            textDecoration: "none",
+                            "&:hover": { textDecoration: "underline" },
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/profile/${post.user.handle}`);
+                          }}
+                        >
+                          {post.user.name}
                         </Typography>
-                        <Typography variant="caption" color="#71767b">
-                          &bull;&nbsp;{convertTime(post?.createdAt)}
-                        </Typography>
+                        <Box sx={{ display: "flex" }}>
+                          <Typography variant="caption" color="#71767b">
+                            @{post.user.handle}&nbsp;
+                          </Typography>
+                          <Typography variant="caption" color="#71767b">
+                            &bull;&nbsp;{convertTime(post?.createdAt)}
+                          </Typography>
+                        </Box>
                       </Box>
+                      <IconButton
+                        aria-label="More"
+                        onClick={() => {
+                          // setEditing(false);
+                          // setReplying((prev) => !prev);
+                        }}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
                     </Box>
-                    <IconButton
-                      aria-label="More"
-                      onClick={() => {
-                        // setEditing(false);
-                        // setReplying((prev) => !prev);
-                      }}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
-                  <Box padding={1} paddingTop={1} paddingLeft={7}>
-                    <Typography variant="h6" fontWeight="regular">
-                      {post?.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        display: "-webkit-box",
-                        overflow: "hidden",
-                        WebkitBoxOrient: "vertical",
-                        WebkitLineClamp: 4,
-                      }}
-                    >
-                      {post.body}
-                    </Typography>
-                  </Box>
-                  {/* <Box
+                    <Box padding={1} paddingTop={1} paddingLeft={7}>
+                      <Typography variant="h6" fontWeight="regular">
+                        {post?.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          display: "-webkit-box",
+                          overflow: "hidden",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 4,
+                        }}
+                      >
+                        {post.body}
+                      </Typography>
+                    </Box>
+                    {/* <Box
                     paddingLeft={6}
                     sx={{
                       display: "flex",
@@ -168,7 +172,8 @@ const PostList = ({ posts }) => {
                       <Typography variant="subtitle2">{"31"}</Typography>
                     </Box>
                   </Box> */}
-                </Paper>
+                  </CardActionArea>
+                </Card>
               </Link>
             </Grid>
           );
