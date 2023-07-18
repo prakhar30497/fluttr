@@ -1,4 +1,4 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -10,7 +10,7 @@ import { createComment } from "../services/api";
 import { useAuth } from "../hooks/AuthContext";
 import { usePost } from "../hooks/PostContext";
 
-const Comments = ({ comments }) => {
+const Comments = forwardRef(({ comments, ref }) => {
   const { post, createLocalComment } = usePost();
   const { currentUser } = useAuth();
 
@@ -34,6 +34,7 @@ const Comments = ({ comments }) => {
         <Typography variant="h6">Comments</Typography>
       </Box>
       <CommentForm
+        ref={ref}
         rows={2}
         loading={loading}
         error={error}
@@ -48,6 +49,6 @@ const Comments = ({ comments }) => {
       </Grid>
     </div>
   );
-};
+});
 
 export default Comments;

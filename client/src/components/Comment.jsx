@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
@@ -10,10 +11,12 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import EditIcon from "@mui/icons-material/Edit";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { usePost } from "../hooks/PostContext";
 import { useUser } from "../hooks/UserContext";
 import { useAuth } from "../hooks/AuthContext";
 import CommentForm from "./CommentForm";
+import { stringAvatar, convertTime } from "../../utils/index";
 import { useAsyncFn } from "../hooks/useAsync";
 import {
   createComment,
@@ -23,6 +26,7 @@ import {
 } from "../services/api";
 
 const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
 
   const isMyComment = currentUser?.id === user?.id;
@@ -110,10 +114,49 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
           padding={1}
           paddingBottom={0}
         >
-          <Typography variant="subtitle2">{user.name}</Typography>
+          {/* <Typography variant="subtitle2">{user.name}</Typography>
           <Typography variant="body2">
             {dateFormatter.format(Date.parse(createdAt))}
-          </Typography>
+          </Typography> */}
+          <Box
+            sx={{
+              marginRight: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                textDecoration: "none",
+                "&:hover": { textDecoration: "underline" },
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(`/profile/${user.handle}`);
+              }}
+            >
+              {user.name}
+            </Typography>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="caption" color="#71767b">
+                @{user.handle}&nbsp;
+              </Typography>
+              <Typography variant="caption" color="#71767b">
+                &bull;&nbsp;{convertTime(createdAt)}
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton
+            aria-label="More"
+            onClick={() => {
+              // setEditing(false);
+              // setReplying((prev) => !prev);
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
         </Box>
         <Box padding={1}>
           <Typography variant="body2">{message}</Typography>
@@ -179,6 +222,7 @@ const Comment = ({ id, message, user, createdAt, likeCount, likedByMe }) => {
       {replying && (
         <CommentForm
           rows={1}
+          placeholder={`Reply to ${user.name}`}
           loading={createCommentFn.loading}
           error={createCommentFn.error}
           onSubmit={onCommentReply}

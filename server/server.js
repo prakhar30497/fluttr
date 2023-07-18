@@ -55,6 +55,8 @@ const POST_SELECT_FIELDS = {
       handle: true,
     },
   },
+  likes: true,
+  comments: true,
 };
 const COMMENT_SELECT_FIELDS = {
   id: true,
@@ -256,14 +258,21 @@ app.post("/post", async (req, res) => {
   res.send(post);
 });
 
-app.get("/posts", async (req, res) => {
+app.get("/posts", auth, async (req, res) => {
+  const { userId } = req;
   const posts = await prisma.post.findMany({
     select: POST_SELECT_FIELDS,
+  });
+  posts.forEach((post) => {
+    post.liked = !!post.likes.find((like) => like.userId === userId);
+    post.likes = post.likes.length;
+    post.comments = post.comments.length;
   });
   res.json(posts);
 });
 
-app.get("/profile/:handle", async (req, res) => {
+app.get("/profile/:handle", auth, async (req, res) => {
+  const { userId } = req;
   const profile = await prisma.user
     .findFirst({
       where: { handle: req.params.handle },
@@ -283,6 +292,12 @@ app.get("/profile/:handle", async (req, res) => {
         select: POST_SELECT_FIELDS,
       });
 
+      posts.forEach((post) => {
+        post.liked = !!post.likes.find((like) => like.userId === userId);
+        post.likes = post.likes.length;
+        post.comments = post.comments.length;
+      });
+
       return {
         posts,
         user,
@@ -298,6 +313,8 @@ app.get("/post/:id/:userId", async (req, res) => {
       select: {
         body: true,
         title: true,
+        createdAt: true,
+        likes: true,
         user: {
           select: {
             id: true,
@@ -415,6 +432,27 @@ app.post("/posts/:postId/comments/:commentId/toggleLike", async (req, res) => {
   } else {
     console.log("Unlike", data);
     await prisma.like.delete({ where: { userId_commentId: data } });
+    res.send({ addLike: false });
+  }
+});
+
+app.post("/posts/:postId/toggleLike", async (req, res) => {
+  const data = {
+    postId: req.params.postId,
+    userId: req.body.userId,
+  };
+
+  const like = await prisma.postLike.findUnique({
+    where: { userId_postId: data },
+  });
+
+  if (like == null) {
+    console.log("Like", data);
+    await prisma.postLike.create({ data });
+    res.send({ addLike: true });
+  } else {
+    console.log("Unlike", data);
+    await prisma.postLike.delete({ where: { userId_postId: data } });
     res.send({ addLike: false });
   }
 });

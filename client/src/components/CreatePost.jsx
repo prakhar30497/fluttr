@@ -71,7 +71,7 @@ const CreatePost = (props) => {
             autoFocus
             margin="dense"
             multiline
-            rows={4}
+            rows={8}
             id="body"
             fullWidth
             variant="outlined"

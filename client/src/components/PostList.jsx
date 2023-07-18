@@ -10,16 +10,31 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
-import ForumRoundedIcon from "@mui/icons-material/ForumRounded";
-import ForumIcon from "@mui/icons-material/Forum";
+import ModeCommentOutlinedIcon from "@mui/icons-material/ModeCommentOutlined";
 import Card from "@mui/material/Card";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardContent from "@mui/material/CardContent";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { stringAvatar, convertTime } from "../../utils/index";
+import { togglePostLike } from "../services/api";
+import { useAsyncFn } from "../hooks/useAsync";
+import { useAuth } from "../hooks/AuthContext";
 
-const PostList = ({ posts }) => {
+const PostList = ({ posts, toggleLocalPostLike }) => {
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const toggleLikeFn = useAsyncFn(togglePostLike);
+
+  const onToggleLike = (e, id) => {
+    e.preventDefault();
+    return toggleLikeFn
+      .execute({
+        userId: currentUser.id,
+        postId: id,
+      })
+      .then(({ addLike }) => toggleLocalPostLike(id, addLike));
+  };
+
   return (
     <Grid container direction={"column"} style={{ paddingBottom: "100px" }}>
       {posts?.length ? (
@@ -29,7 +44,6 @@ const PostList = ({ posts }) => {
               <Link to={`/post/${post.id}`} style={{ textDecoration: "none" }}>
                 <Card>
                   <CardActionArea
-                    variant="outlined"
                     sx={{
                       boxShadow: 1,
                       borderRadius: 2,
@@ -85,7 +99,7 @@ const PostList = ({ posts }) => {
                         <MoreVertIcon />
                       </IconButton>
                     </Box>
-                    <Box padding={1} paddingTop={1} paddingLeft={7}>
+                    <Box padding={1} paddingTop={2} paddingLeft={7}>
                       <Typography variant="h6" fontWeight="regular">
                         {post?.title}
                       </Typography>
@@ -101,77 +115,113 @@ const PostList = ({ posts }) => {
                         {post.body}
                       </Typography>
                     </Box>
-                    {/* <Box
-                    paddingLeft={6}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "2rem",
-                      justifyContent: "start",
-                    }}
-                  >
                     <Box
+                      paddingLeft={6}
+                      marginTop={1}
+                      marginBottom={1}
                       sx={{
                         display: "flex",
                         flexDirection: "row",
-                        alignItems: "center",
+                        gap: "2rem",
+                        justifyContent: "start",
                       }}
                     >
-                      <IconButton
-                        aria-label="Reply"
-                        size="small"
-                        // onClick={() => {
-                        //   setEditing(false);
-                        //   setReplying((prev) => !prev);
-                        // }}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
                       >
-                        <ForumOutlinedIcon color="primary" />
-                      </IconButton>
-                      <Typography variant="subtitle2">{"31"}</Typography>
-                    </Box>
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <IconButton
-                        aria-label="Like"
-                        size="small"
-                        // onClick={onToggleLike}
-                        // disabled={!authUser}
-                      >
-                        {false ? (
-                          <FavoriteIcon style={{ color: "#f91880" }} />
-                        ) : (
-                          <FavoriteBorderIcon style={{ color: "#f91880" }} />
+                        <IconButton
+                          aria-label="Like"
+                          size="small"
+                          onClick={(e) => onToggleLike(e, post.id)}
+                        >
+                          {post.liked ? (
+                            <FavoriteIcon
+                              style={{ color: "#f91880" }}
+                              sx={{ fontSize: "20px" }}
+                            />
+                          ) : (
+                            <FavoriteBorderIcon
+                              style={{ color: "#f91880" }}
+                              sx={{ fontSize: "20px" }}
+                            />
+                          )}
+                        </IconButton>
+                        {post.likes > 0 && (
+                          <Typography
+                            variant="subtitle2"
+                            paddingLeft={1}
+                            sx={{ fontSize: "12px" }}
+                          >
+                            {post.likes}
+                          </Typography>
                         )}
-                      </IconButton>
-                      <Typography variant="subtitle2">{"31"}</Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <IconButton
-                        aria-label="Repost"
-                        // onClick={() => {
-                        //   setReplying(false);
-                        //   setEditing((prev) => !prev);
-                        // }}
-                        // disabled={!isMyComment || !authUser}
-                        size="small"
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
                       >
-                        <SwapHorizIcon style={{ color: "#00ba7c" }} />
-                      </IconButton>
-                      <Typography variant="subtitle2">{"31"}</Typography>
+                        <IconButton
+                          aria-label="Repost"
+                          // onClick={() => {
+                          //   setReplying(false);
+                          //   setEditing((prev) => !prev);
+                          // }}
+                          // disabled={!isMyComment || !authUser}
+                          size="small"
+                        >
+                          <SwapHorizIcon
+                            style={{ color: "#00ba7c" }}
+                            sx={{ fontSize: "20px" }}
+                          />
+                        </IconButton>
+                        {post.reposts?.length > 0 && (
+                          <Typography
+                            variant="subtitle2"
+                            paddingLeft={1}
+                            sx={{ fontSize: "12px" }}
+                          >
+                            {post.reposts?.length}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <IconButton
+                          aria-label="Reply"
+                          size="small"
+                          // onClick={() => {
+                          //   setEditing(false);
+                          //   setReplying((prev) => !prev);
+                          // }}
+                        >
+                          <ModeCommentOutlinedIcon
+                            sx={{ fontSize: "20px" }}
+                            color="primary"
+                          />
+                        </IconButton>
+                        {post.comments > 0 && (
+                          <Typography
+                            variant="subtitle2"
+                            paddingLeft={1}
+                            sx={{ fontSize: "12px" }}
+                          >
+                            {post.comments}
+                          </Typography>
+                        )}
+                      </Box>
                     </Box>
-                  </Box> */}
                   </CardActionArea>
                 </Card>
               </Link>
