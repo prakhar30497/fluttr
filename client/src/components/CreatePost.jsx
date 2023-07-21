@@ -18,19 +18,19 @@ const CreatePost = (props) => {
   const [bodyError, setBodyError] = useState(false);
 
   const errors = {
-    title: "Input upto 50 characters",
-    body: "Input upto 300 characters",
+    title: "Input upto 100 characters",
+    body: "Input upto 500 characters",
   };
 
   const { currentUser } = useAuth();
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    e.target.value.length > 50 ? setTitleError(true) : setTitleError(false);
+    e.target.value.length > 100 ? setTitleError(true) : setTitleError(false);
   };
   const handleBodyChange = (e) => {
     setBody(e.target.value);
-    e.target.value.length > 300 ? setBodyError(true) : setBodyError(false);
+    e.target.value.length > 500 ? setBodyError(true) : setBodyError(false);
   };
 
   return (
@@ -61,7 +61,7 @@ const CreatePost = (props) => {
               titleError && {
                 endAdornment: (
                   <InputAdornment position="start">
-                    {title.length}/50
+                    {title.length}/100
                   </InputAdornment>
                 ),
               }
@@ -84,7 +84,7 @@ const CreatePost = (props) => {
               bodyError && {
                 endAdornment: (
                   <InputAdornment position="start">
-                    {body.length}/300
+                    {body.length}/500
                   </InputAdornment>
                 ),
               }

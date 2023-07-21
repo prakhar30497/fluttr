@@ -123,19 +123,19 @@ const Chat = ({ selectedUser, setSelectedUser }) => {
                   padding={1}
                   sx={{
                     backgroundColor:
-                      message.senderId === currentUser.id
+                      message.senderId === currentUser?.id
                         ? "#1d9bf0"
                         : isDarkMode
                         ? "#2f3336"
                         : "#f5f5f5",
                     alignSelf:
-                      message.senderId === currentUser.id
+                      message.senderId === currentUser?.id
                         ? "flex-end"
                         : "flex-start",
                     borderRadius: "10px",
                     padding: "10px",
                     color:
-                      message.senderId !== currentUser.id && !isDarkMode
+                      message.senderId !== currentUser?.id && !isDarkMode
                         ? "#000000"
                         : "#fff",
                   }}
