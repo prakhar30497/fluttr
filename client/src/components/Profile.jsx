@@ -15,6 +15,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
 import { useAsync } from "../hooks/useAsync";
 import { useAuth } from "../hooks/AuthContext";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import {
   getUserProfile,
   checkFollower,
@@ -27,6 +28,7 @@ import { stringAvatar } from "../../utils/index";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
   const { userHandle } = useParams();
 
   const { currentUser } = useAuth();
@@ -39,7 +41,7 @@ const Profile = () => {
     loading,
     error,
     value: profile,
-  } = useAsync(() => getUserProfile(userHandle));
+  } = useAsync(() => getUserProfile(axiosPrivate, userHandle));
 
   useEffect(() => {
     checkFollower(currentUser?.id, profile?.user?.id).then((resp) => {
@@ -69,6 +71,19 @@ const Profile = () => {
             }
           });
     }
+  };
+
+  const toggleLocalPostLike = (id, addLike) => {
+    profile?.posts.forEach((post) => {
+      if (post.id === id) {
+        post.liked = !post.liked;
+        if (addLike) {
+          post.likes += 1;
+        } else {
+          post.likes -= 1;
+        }
+      }
+    });
   };
 
   const handleEditDialogOpen = () => {
@@ -191,7 +206,12 @@ const Profile = () => {
           <Box padding={1}>
             <Typography variant="h6">Posts</Typography>
           </Box>
-          {profile?.posts && <PostList posts={profile.posts} />}
+          {profile?.posts && (
+            <PostList
+              posts={profile.posts}
+              toggleLocalPostLike={toggleLocalPostLike}
+            />
+          )}
         </Container>
         <EditProfile
           open={openEditDialog}

@@ -22,6 +22,7 @@ model Post {
   likes     PostLike[]
   group     Group?     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId   String?
+  reposts   Repost[]
 }
 
 model User {
@@ -47,6 +48,7 @@ model User {
   sentMessages     Message[] @relation("sender")
   receivedMessages Message[] @relation("recipient")
   chats          ChatParticipant[] 
+  reposts   Repost[]
   // friends         User[] @relation("friends")
   // friendsRelation User[] @relation("friends")
 }
@@ -149,4 +151,14 @@ model ChatParticipant {
   userId   String
   chat     Chat   @relation(fields: [chatId], references: [id])
   chatId   String
+}
+
+model Repost {
+  id       String @id @default(uuid())
+  post     Post   @relation(fields: [postId], references: [id])
+  postId   String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+
+  createdAt DateTime @default(now())
 }

@@ -23,8 +23,8 @@ export const loginUser = (email, password) => {
   });
 };
 
-export const getPosts = () => {
-  return callEndpoint("/posts");
+export const getPosts = (axiosPrivate) => {
+  return callPrivateEndpoint(axiosPrivate, "/posts");
 };
 
 export const getPost = (id, userId) => {
@@ -39,8 +39,8 @@ export const getUser = (email, accessToken) => {
   });
 };
 
-export const getUserProfile = (handle) => {
-  return callEndpoint(`/profile/${handle}`);
+export const getUserProfile = (axiosPrivate, handle) => {
+  return callPrivateEndpoint(axiosPrivate, `/profile/${handle}`);
 };
 
 export const createUser = (username, email) => {
@@ -90,6 +90,13 @@ export const deleteComment = ({ postId, id }) => {
 
 export const toggleLike = ({ userId, postId, id }) => {
   return callEndpoint(`posts/${postId}/comments/${id}/toggleLike`, {
+    method: "POST",
+    data: { userId },
+  });
+};
+
+export const togglePostLike = ({ userId, postId }) => {
+  return callEndpoint(`posts/${postId}/toggleLike`, {
     method: "POST",
     data: { userId },
   });

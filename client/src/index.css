@@ -21,6 +21,8 @@ body {
 
   --primary: #2196f3;
   --light-gray: #aaaaaa;
+  --border-gray: #eff3f4;
+  --dark-border-gray: #2f3336;
 }
 
 * {

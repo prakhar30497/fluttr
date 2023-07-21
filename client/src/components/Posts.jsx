@@ -37,13 +37,30 @@ const Posts = () => {
   //   getPosts().then((data) => setPosts(data));
   // }, [posted]);
 
-  const { loading, error, value: posts } = useAsync(getPosts, [posted]);
+  const {
+    loading,
+    error,
+    value: posts,
+  } = useAsync(() => getPosts(axiosPrivate), [posted]);
 
   // socket.on("receive-post", (newPost) => {
   //   console.log("new", newPost);
   //   // posts?.push(newPost);
   //   setPosted(posted + 1);
   // });
+
+  const toggleLocalPostLike = (id, addLike) => {
+    posts.forEach((post) => {
+      if (post.id === id) {
+        post.liked = !post.liked;
+        if (addLike) {
+          post.likes += 1;
+        } else {
+          post.likes -= 1;
+        }
+      }
+    });
+  };
 
   const handleFabClick = () => {
     setDialogOpen(true);
@@ -102,7 +119,7 @@ const Posts = () => {
             </Typography>
           </Box>
         )}
-        <PostList posts={posts} />
+        <PostList posts={posts} toggleLocalPostLike={toggleLocalPostLike} />
         <CreatePost
           open={dialogOpen}
           handleDialogClose={handleDialogClose}

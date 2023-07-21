@@ -6,14 +6,17 @@ const postLongDate = {
   dateStyle: "medium",
   timeStyle: "short",
 };
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  // dateStyle: "medium",
-  // timeStyle: "short",
+const shortDateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
   day: "numeric",
 });
 
-export const convertTime = (time) => {
+const longDateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+export const convertTime = (time, long) => {
   const currentTime = Date.now();
   const desiredTime = new Date(time);
   const timeDifference = currentTime - desiredTime;
@@ -22,6 +25,8 @@ export const convertTime = (time) => {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
 
+  const formatter = long ? longDateFormatter : shortDateFormatter;
+
   if (hours < 24) {
     if (hours < 1) {
       return minutes + "m";
@@ -29,7 +34,7 @@ export const convertTime = (time) => {
       return hours + "h";
     }
   } else {
-    return dateFormatter.format(Date.parse(time));
+    return formatter.format(Date.parse(time));
   }
 };
 
